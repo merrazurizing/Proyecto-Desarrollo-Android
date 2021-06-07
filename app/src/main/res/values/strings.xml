@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">miprimeraapp</string>
+    <string name="text1">Nombre</string>
+    <string name="text2">Contresaña</string>
+    <string name="text3">RUN</string>
+    <string name="textRegistrar">Registrar</string>
+    <string name="textIngresar">Ingresar</string>
+    <string name="intentos">Intentos</string>
+    <string name="textAtras">Cerrar Sesión</string>
+    <string name="textConfirmar"> Confirmar Acción</string>
+</resources>
