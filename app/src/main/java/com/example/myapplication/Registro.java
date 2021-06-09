@@ -17,10 +17,7 @@ import android.widget.Toast;
 import com.example.myapplication.Models.Accion_Usuario;
 import com.example.myapplication.Models.Usuario;
 
-import java.util.ArrayList;
-
 import io.realm.Realm;
-import io.realm.RealmConfiguration;
 
 import static android.app.ProgressDialog.show;
 
@@ -116,7 +113,7 @@ public class Registro extends AppCompatActivity {
     }
 
     private void sendSecondActivity(String nombre,String run){
-        Intent intent = new Intent(Registro.this, Lista_Acciones_Usuario.class);
+        Intent intent = new Intent(Registro.this, Acciones_Usuario.class);
         Bundle b =new Bundle();
 
         b.putString("nombre",nombre);

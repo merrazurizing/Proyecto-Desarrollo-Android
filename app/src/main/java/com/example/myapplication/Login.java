@@ -96,7 +96,7 @@ public class Login extends AppCompatActivity {
     }
 
     private void sendSecondActivity(String nombre,String run){
-        Intent intent = new Intent(Login.this, Lista_Acciones_Usuario.class);
+        Intent intent = new Intent(Login.this, Acciones_Usuario.class);
         Bundle b =new Bundle();
 
         b.putString("nombre",nombre);

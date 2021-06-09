@@ -2,8 +2,6 @@ package com.example.myapplication;
 
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.OnLifecycleEvent;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,20 +9,16 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.myapplication.Models.Accion_Usuario;
 import com.example.myapplication.Models.Usuario;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 
 import io.realm.Realm;
 
-public class Lista_Acciones_Usuario extends AppCompatActivity {
+public class Acciones_Usuario extends AppCompatActivity {
 
     private TextView text1_second,text2_second,text3_second;
     private Button btn_atras_second;
@@ -76,7 +70,7 @@ public class Lista_Acciones_Usuario extends AppCompatActivity {
                     mRealm.insertOrUpdate(accion);
                     mRealm.commitTransaction();
 
-                    Intent intent =new Intent(Lista_Acciones_Usuario.this, Login.class);
+                    Intent intent =new Intent(Acciones_Usuario.this, Login.class);
                     clearShared();
                     startActivity(intent);
             }
