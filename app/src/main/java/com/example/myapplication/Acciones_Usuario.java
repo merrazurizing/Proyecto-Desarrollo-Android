@@ -2,17 +2,24 @@ package com.example.myapplication;
 
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.myapplication.Models.Accion_Usuario;
 import com.example.myapplication.Models.Usuario;
+import com.example.myapplication.adapters.AccioneListAdapter;
 
 import java.util.ArrayList;
 
@@ -25,6 +32,15 @@ public class Acciones_Usuario extends AppCompatActivity {
     private SharedPreferences prefs;
     private Realm mRealm;
     private boolean primer_login;
+
+    private RecyclerView recyclerView;
+    private FrameLayout frameLayout;
+
+    private AccioneListAdapter adapter;
+
+    private ArrayList<Accion_Usuario> list;
+
+    @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         mRealm = Realm.getDefaultInstance();
@@ -36,7 +52,7 @@ public class Acciones_Usuario extends AppCompatActivity {
 
         text1_second =findViewById(R.id.text1_second);
         text2_second =findViewById(R.id.text2_second);
-        text3_second =findViewById(R.id.text3_second);
+
 
         btn_atras_second=findViewById(R.id.btn_atras_second);
 
@@ -47,19 +63,33 @@ public class Acciones_Usuario extends AppCompatActivity {
         primer_login=bundle.getBoolean("primer_login");
         saveShared(nombre,run);
 
-        text1_second.setText(nombre);
-        text2_second.setText(run);
+        text1_second.setText("Nombre: "+ nombre);
+        text2_second.setText("RUN: "+ run);
 
         ArrayList<Accion_Usuario> lista_acciones=new ArrayList<>();
         ArrayList<Accion_Usuario> lista_acciones_reverse=new ArrayList<>();
         Usuario usuario = new Usuario();
+
         lista_acciones=new ArrayList(mRealm.where(Accion_Usuario.class).equalTo("run",run).findAll());
+
         String lista_mostrar="";
         for (int i =0 ; i<= lista_acciones.size()-1  ;i++){
             lista_mostrar+=(i+1)+"--"+lista_acciones.get(i).getRun()+"--"+lista_acciones.get(i).getAccion()+"\n";
         }
+        recyclerView = findViewById(R.id.recyclerView);
+        //frameLayout = findViewById(R.id.framelayout);
+        adapter = new AccioneListAdapter(lista_acciones, new AccioneListAdapter.OnItemClickListener() {
+            @Override
+            public void OnItemClick(Accion_Usuario accionUsuario, int position) {
+                Toast.makeText(getApplicationContext(),"item:"+accionUsuario.getId(),Toast.LENGTH_LONG).show();
+            }
+        });
 
-        text3_second.setText(lista_mostrar);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(adapter);
+
+        //text3_second.setText(lista_mostrar);
         btn_atras_second.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -102,11 +132,11 @@ public class Acciones_Usuario extends AppCompatActivity {
             mRealm.insertOrUpdate(accion);
             mRealm.commitTransaction();
 
+            list=new ArrayList(mRealm.where(Accion_Usuario.class).equalTo("run",text2_second.getText().toString()).findAll());
+            adapter.updateList(list);
+            adapter.notifyDataSetChanged();
+
         }
-
-
-
-
 
         ArrayList<Accion_Usuario> lista_acciones=new ArrayList<>();
         lista_acciones=new ArrayList(mRealm.where(Accion_Usuario.class).equalTo("run",text2_second.getText().toString()).findAll());
@@ -114,7 +144,7 @@ public class Acciones_Usuario extends AppCompatActivity {
         for (int i =0 ; i<= lista_acciones.size()-1  ;i++){
             lista_mostrar+=(i+1)+"--"+lista_acciones.get(i).getRun()+"--"+lista_acciones.get(i).getAccion()+"\n";
         }
-        text3_second.setText(lista_mostrar);
+        //text3_second.setText(lista_mostrar);
     }
 
 

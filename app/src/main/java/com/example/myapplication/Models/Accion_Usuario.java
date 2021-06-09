@@ -27,6 +27,9 @@ public class Accion_Usuario extends RealmObject {
         this.accion = accion;
     }
 
+
+
+
     public String getRun() {
         return run;
     }
