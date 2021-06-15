@@ -28,8 +28,6 @@ public class Accion_Usuario extends RealmObject {
     }
 
 
-
-
     public String getRun() {
         return run;
     }
