@@ -16,17 +16,27 @@ public class Usuario extends RealmObject {
     private String run;
     private String password;
 
+    private boolean sendBD;
+
     public Usuario() {
     }
 
-    public Usuario(String nombre, String run, String password) {
+    public Usuario(String nombre, String run, String password , boolean sendBD) {
         Random rand = new Random();
         this.id=rand.nextInt(1000);
         this.nombre = nombre;
         this.run = run;
         this.password = password;
+        this.sendBD=sendBD;
     }
 
+    public boolean isSendBD() {
+        return sendBD;
+    }
+
+    public void setSendBD(boolean sendBD) {
+        this.sendBD = sendBD;
+    }
 
     public int getId() {
         return id;

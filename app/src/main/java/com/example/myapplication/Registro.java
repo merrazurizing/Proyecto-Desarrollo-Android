@@ -14,10 +14,28 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.myapplication.Models.Accion_Usuario;
 import com.example.myapplication.Models.Usuario;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
+
+
+
 import io.realm.Realm;
+import io.realm.RealmResults;
+
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 
 import static android.app.ProgressDialog.show;
 
@@ -28,6 +46,9 @@ public class Registro extends AppCompatActivity {
     private Button btn1;
     private SharedPreferences prefs;
     Realm mRealm;
+
+    public static final String URL_BASE = "http://abascur.cl/android/misnotasapp/";
+    public static final String ACESS_ID="18808222";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,13 +96,14 @@ public class Registro extends AppCompatActivity {
     private void guardarEnRealm(String nombre, String run, String password) {
         mRealm = Realm.getDefaultInstance();
 
-        Usuario usuario = new Usuario(nombre,run,password);
+        Usuario usuario = new Usuario(nombre,run,password,false);
         Accion_Usuario accion = new Accion_Usuario(run,"Registro");
 
         mRealm.beginTransaction();
         mRealm.insertOrUpdate(usuario);
         mRealm.insertOrUpdate(accion);
         mRealm.commitTransaction();
+        SyncbdRemote();
     }
 
     private boolean estaRegistrado(String run){
@@ -133,7 +155,65 @@ public class Registro extends AppCompatActivity {
         editor.apply();
     }
 
+    private void SyncbdRemote(){
+        RealmResults<Usuario> ListadoNoSync=mRealm.where(Usuario.class).equalTo("sendBD",false).findAll();
+        if(ListadoNoSync.size()>0){
+            for(int i=0;i<ListadoNoSync.size();i++){
+                String nombre = ListadoNoSync.get(i).getNombre();
+                String rut = ListadoNoSync.get(i).getRun();
+                String password = ListadoNoSync.get(i).getPassword();
 
+                InsertOrUpdate(rut,nombre,password);
+            }
+        }
+    }
+
+    private void InsertOrUpdate(final String rut,final String nombre,final String password){
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("rutUsuario", String.valueOf(rut));
+        params.put("nombreUsuario", String.valueOf(nombre));
+        params.put("contrasenaUsuario", String.valueOf(password));
+        params.put("fechaHoraCreacion",dtf.format(now));
+        params.put("idAcceso",ACESS_ID);
+        // Toast.makeText(getApplicationContext(), params.toString() , Toast.LENGTH_SHORT).show();
+
+        String URL = URL_BASE+"InsertOrUpdateAlumno";
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+
+        JsonObjectRequest jsonReque = new JsonObjectRequest(Request.Method.POST, URL, new JSONObject(params),
+                new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // Log.d("JSONPost", response.toString());
+                        try {
+                            String status = response.getString("status");
+                            String mensaje = response.getString("mensaje");
+                            if (status.equals("success")) {
+                                // Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
+                                /*alumnosAppV2: Se actualiza en realm el estado*/
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // VolleyLog.d("JSONPost", "Error: " + error.getMessage());
+                Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        queue.add(jsonReque);
+    }
+
+    
 
     private String getSharedNombre(){
         return prefs.getString("nombre","");

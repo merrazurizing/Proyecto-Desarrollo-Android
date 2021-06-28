@@ -7,13 +7,38 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import android.content.DialogInterface;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.Toast;
+
+
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import static java.lang.Thread.sleep;
 
 public class Pantalla_Carga extends AppCompatActivity {
     private SharedPreferences prefs;
+
+    public static final String URL_BASE = "http://abascur.cl/android/misnotasapp/";
+    public static final String ACESS_ID="18808222";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,5 +100,7 @@ public class Pantalla_Carga extends AppCompatActivity {
         Realm.setDefaultConfiguration(config);
 
     }
+
+
 
 }
