@@ -40,7 +40,8 @@ public class Login extends AppCompatActivity {
     private Realm mRealm;
     public static final String URL_BASE = "https://abascur.cl/android/misnotasapp/";
     public static final String ACESS_ID="18808222";
-    public JSONObject USUARIO;
+    public String response_rut;
+    public String response_password;
 
 
     @Override
@@ -78,14 +79,7 @@ public class Login extends AppCompatActivity {
                     usuario=mRealm.where(Usuario.class).equalTo("run",run).findFirst();
                     getUsuario(run);
 
-                    /*
-                    try {
-                        String responseRun = USUARIO.getJSONObject("mensaje").getString("rutUsuario");
-                        String responseContrasenna = USUARIO.getJSONObject("mensaje").getString("contrasenaUsuario");
-
-                        Toast.makeText(getApplicationContext(),responseRun+" "+responseContrasenna,Toast.LENGTH_LONG).show();
-
-                        if(responseRun.equals(run) && responseContrasenna.equals(contrasena)){
+                        if(response_rut.equals(run) && response_password.equals(contrasena)){
                             Accion_Usuario accion = new Accion_Usuario(run,"Login");
 
                             mRealm.beginTransaction();
@@ -97,10 +91,6 @@ public class Login extends AppCompatActivity {
                         else{
                             Toast.makeText(getApplicationContext(),"Error de contraseña o usuario",Toast.LENGTH_LONG).show();
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    */
 
                 }else{
                     Toast.makeText(getApplicationContext(),"ERROR",Toast.LENGTH_LONG).show();
@@ -112,7 +102,6 @@ public class Login extends AppCompatActivity {
     }
 
     private void getUsuario(final String run) {
-        System.out.println("PUTA");
         Map<String, String> params = new HashMap<String, String>();
         params.put("rutUsuario", String.valueOf(run));
         params.put("idAcceso",ACESS_ID);
@@ -130,16 +119,10 @@ public class Login extends AppCompatActivity {
                         // Log.d("JSONPost", response.toString());
                         try {
                             String status = response.getString("status");
-                            String mensaje = response.getString("mensaje");
+                            JSONObject mensaje = response.getJSONObject("mensaje");
                             if (status.equals("success")) {
-                                Toast.makeText(getApplicationContext(), mensaje, Toast.LENGTH_SHORT).show();
-                                /*alumnosAppV2: Se actualiza en realm el estado*/
-                                System.out.println(response.toString());
-                                System.out.println(response.getJSONObject("mensaje"));
-                                System.out.println(mensaje);
-                                System.out.println(response.getJSONObject("mensaje").getString("rutUsuario"));
-                                USUARIO = response;
-
+                                //Toast.makeText(getApplicationContext(), mensaje, Toast.LENGTH_SHORT).show();
+                                getUserData(mensaje.getString("rutUsuario"),mensaje.getString("contrasenaUsuario"));
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -157,6 +140,12 @@ public class Login extends AppCompatActivity {
 
         queue.add(jsonReque);
 
+    }
+
+    private void getUserData(String rut,String password){
+        response_rut=rut;
+        response_password=password;
+        System.out.println("rut : "+response_rut + "Pass:"+ response_password);
     }
 
     private boolean isValidForm(){
