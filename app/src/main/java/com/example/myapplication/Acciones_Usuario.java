@@ -60,8 +60,9 @@ public class Acciones_Usuario extends AppCompatActivity {
 
         String nombre= bundle.getString("nombre");
         String run = bundle.getString("run");
+        String contrasena = bundle.getString("contrasena");
         primer_login=bundle.getBoolean("primer_login");
-        saveShared(nombre,run);
+        saveShared(nombre,run,contrasena);
 
         text1_second.setText("Nombre: "+ nombre);
         text2_second.setText("RUN: "+ run);
@@ -158,10 +159,13 @@ public class Acciones_Usuario extends AppCompatActivity {
         editor.apply();
     }
 
-    private  void saveShared(String nombre,String run){
+    private  void saveShared(String nombre,String run, String contrasena){
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("nombre",nombre);
         editor.putString("run",run);
+        editor.putString("contrasena",contrasena);
+        System.out.println("run "+run);
+        System.out.println("contrasena "+contrasena);
         editor.apply();
     }
 

@@ -74,6 +74,7 @@ public class Login extends AppCompatActivity {
 
                 if(isValidForm()){
                     /* Sacar pass de realm y no del shared , lo mismo con el rut */
+
                     mRealm = Realm.getDefaultInstance();
                     Usuario usuario = new Usuario();
                     usuario=mRealm.where(Usuario.class).equalTo("run",run).findFirst();

@@ -78,9 +78,9 @@ public class Registro extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(),"Usuario ya esta registrado",Toast.LENGTH_LONG).show();
                         }else {
                             Toast.makeText(getApplicationContext(),"OK",Toast.LENGTH_LONG).show();
-                            saveShared(nombre,run,password);
+                            //saveShared(nombre,password,run);
                             guardarEnRealm(nombre,run,password);
-                            sendSecondActivity(nombre,password);
+                            sendSecondActivity(nombre,run,password);
                         }
 
                     }else{
@@ -139,12 +139,13 @@ public class Registro extends AppCompatActivity {
         return r;
     }
 
-    private void sendSecondActivity(String nombre,String run){
+    private void sendSecondActivity(String nombre,String run,String contrasena){
         Intent intent = new Intent(Registro.this, Acciones_Usuario.class);
         Bundle b =new Bundle();
 
         b.putString("nombre",nombre);
         b.putString("run",run);
+        b.putString("contrasena", contrasena);
         b.putBoolean("primer_login",true);
 
         intent.putExtras(b);
@@ -202,7 +203,6 @@ public class Registro extends AppCompatActivity {
                             String status = response.getString("status");
                             String mensaje = response.getString("mensaje");
                             if (status.equals("success")) {
-                                System.out.println("ASDASDASDASDADASDASD");
                                 // Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
                                 /*alumnosAppV2: Se actualiza en realm el estado*/
                                 UpdateEnviado(rut);

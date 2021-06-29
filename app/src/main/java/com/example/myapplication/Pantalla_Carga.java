@@ -37,7 +37,7 @@ import static java.lang.Thread.sleep;
 public class Pantalla_Carga extends AppCompatActivity {
     private SharedPreferences prefs;
 
-    public static final String URL_BASE = "http://abascur.cl/android/misnotasapp/";
+    public static final String URL_BASE = "https://abascur.cl/android/misnotasapp/";
     public static final String ACESS_ID="18808222";
 
 
@@ -55,11 +55,14 @@ public class Pantalla_Carga extends AppCompatActivity {
 
         String name = getSharedNombre();
 
-        try{Thread.sleep(2000);}
-        catch(InterruptedException e){System.out.println(e);}
+        System.out.println("RUT"+getSharedRut());
+        if(!getSharedRut().equals("")){
+            validarUsuario(getSharedRut());
+        }
+        else{
+            sendMainActivity();
+        }
 
-
-        validarUsuario(getSharedRut());
     }
 
 
@@ -71,8 +74,19 @@ public class Pantalla_Carga extends AppCompatActivity {
     }
     private void sendLoging(){
         /* envez de mandar a loging , tiene que mandar a la pagina de la lista*/
-        Intent intent = new Intent(Pantalla_Carga.this, Login.class);
+
+        Intent intent = new Intent(Pantalla_Carga.this, Acciones_Usuario.class);
         /* agregar una accion al usuario de que logeo*/
+
+        Bundle b =new Bundle();
+
+        b.putString("nombre",getSharedNombre());
+        b.putString("run",getSharedRut());
+        b.putString("contrasena", getSharedPassword());
+        b.putBoolean("primer_login",true);
+
+        intent.putExtras(b);
+
         startActivity(intent);
     }
 
@@ -84,7 +98,7 @@ public class Pantalla_Carga extends AppCompatActivity {
         return prefs.getString("run","");
     }
     private String getSharedPassword(){
-        return prefs.getString("password","");
+        return prefs.getString("contrasena","");
     }
 
     private int getSharedIngresos(){
@@ -107,11 +121,14 @@ public class Pantalla_Carga extends AppCompatActivity {
 
 
     private void validarUsuario(final String run) {
+        System.out.println("ASDASDASDASDASDASDASDASDADASDASD");
+        System.out.println("Run:"+run);
+        System.out.println("Contrasena "+ getSharedPassword());
         Map<String, String> params = new HashMap<String, String>();
-        params.put("rutUsuario", String.valueOf(run));
+        params.put("rutUsuario", run);
         params.put("idAcceso",ACESS_ID);
 
-        System.out.println(run);
+
         // Toast.makeText(getApplicationContext(), params.toString() , Toast.LENGTH_SHORT).show();
         String URL = URL_BASE+"GetUsuario";
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
@@ -125,8 +142,11 @@ public class Pantalla_Carga extends AppCompatActivity {
                         try {
                             String status = response.getString("status");
                             JSONObject mensaje = response.getJSONObject("mensaje");
+
                             if (status.equals("success")) {
-                                if(!mensaje.getString("rutUsuario").equals(getSharedRut()) && !mensaje.getString("contrasenaUsuario").equals(getSharedRut())){
+
+                                if(getSharedRut().equals(mensaje.getString("rutUsuario")) && getSharedPassword().equals(mensaje.getString("contrasenaUsuario"))){
+                                    System.out.println("RUT RESPONSE:" + mensaje.getString("rutUsuario"));
                                     sendLoging();
                                 }else{
                                     sendMainActivity();
