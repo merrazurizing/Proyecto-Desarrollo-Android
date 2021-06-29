@@ -77,16 +77,15 @@ public class Login extends AppCompatActivity {
                     mRealm = Realm.getDefaultInstance();
                     Usuario usuario = new Usuario();
                     usuario=mRealm.where(Usuario.class).equalTo("run",run).findFirst();
-                    getUsuario(run);
 
-                        if(response_rut.equals(run) && response_password.equals(contrasena)){
+                        if(usuario.getRun().equals(run) && usuario.getPassword().equals(contrasena)){
                             Accion_Usuario accion = new Accion_Usuario(run,"Login");
 
                             mRealm.beginTransaction();
                             mRealm.insertOrUpdate(accion);
                             mRealm.commitTransaction();
 
-                            sendSecondActivity(usuario.getNombre(),usuario.getRun());
+                            sendSecondActivity(usuario.getNombre(),usuario.getRun(),usuario.getPassword());
                         }
                         else{
                             Toast.makeText(getApplicationContext(),"Error de contraseña o usuario",Toast.LENGTH_LONG).show();
@@ -101,52 +100,6 @@ public class Login extends AppCompatActivity {
 
     }
 
-    private void getUsuario(final String run) {
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("rutUsuario", String.valueOf(run));
-        params.put("idAcceso",ACESS_ID);
-
-        System.out.println(run);
-        // Toast.makeText(getApplicationContext(), params.toString() , Toast.LENGTH_SHORT).show();
-        String URL = URL_BASE+"GetUsuario";
-        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-
-        JsonObjectRequest jsonReque = new JsonObjectRequest(Request.Method.POST, URL, new JSONObject(params),
-                new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        // Log.d("JSONPost", response.toString());
-                        try {
-                            String status = response.getString("status");
-                            JSONObject mensaje = response.getJSONObject("mensaje");
-                            if (status.equals("success")) {
-                                //Toast.makeText(getApplicationContext(), mensaje, Toast.LENGTH_SHORT).show();
-                                getUserData(mensaje.getString("rutUsuario"),mensaje.getString("contrasenaUsuario"));
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                // VolleyLog.d("JSONPost", "Error: " + error.getMessage());
-                Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        queue.add(jsonReque);
-
-    }
-
-    private void getUserData(String rut,String password){
-        response_rut=rut;
-        response_password=password;
-        System.out.println("rut : "+response_rut + "Pass:"+ response_password);
-    }
 
     private boolean isValidForm(){
         boolean r=false;
@@ -160,13 +113,14 @@ public class Login extends AppCompatActivity {
         return r;
     }
 
-    private void sendSecondActivity(String nombre,String run){
+    private void sendSecondActivity(String nombre,String run,String password){
         Intent intent = new Intent(Login.this, Acciones_Usuario.class);
         Bundle b =new Bundle();
 
         b.putString("nombre",nombre);
         b.putString("run",run);
         b.putBoolean("primer_login",true);
+        b.putString("password" ,password);
         intent.putExtras(b);
         startActivity(intent);
     }

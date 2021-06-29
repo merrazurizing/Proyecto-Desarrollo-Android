@@ -59,12 +59,7 @@ public class Pantalla_Carga extends AppCompatActivity {
         catch(InterruptedException e){System.out.println(e);}
 
 
-        if(name != ""){
-
-            sendLoging();
-        }else{
-            sendMainActivity();
-        }
+        validarUsuario(getSharedRut());
     }
 
 
@@ -84,6 +79,14 @@ public class Pantalla_Carga extends AppCompatActivity {
     private String getSharedNombre(){
         return prefs.getString("nombre","");
     }
+
+    private String getSharedRut(){
+        return prefs.getString("run","");
+    }
+    private String getSharedPassword(){
+        return prefs.getString("password","");
+    }
+
     private int getSharedIngresos(){
         return prefs.getInt("ingresos", 0);
     }
@@ -102,6 +105,50 @@ public class Pantalla_Carga extends AppCompatActivity {
 
     }
 
+
+    private void validarUsuario(final String run) {
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("rutUsuario", String.valueOf(run));
+        params.put("idAcceso",ACESS_ID);
+
+        System.out.println(run);
+        // Toast.makeText(getApplicationContext(), params.toString() , Toast.LENGTH_SHORT).show();
+        String URL = URL_BASE+"GetUsuario";
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+
+        JsonObjectRequest jsonReque = new JsonObjectRequest(Request.Method.POST, URL, new JSONObject(params),
+                new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // Log.d("JSONPost", response.toString());
+                        try {
+                            String status = response.getString("status");
+                            JSONObject mensaje = response.getJSONObject("mensaje");
+                            if (status.equals("success")) {
+                                if(!mensaje.getString("rutUsuario").equals(getSharedRut()) && !mensaje.getString("contrasenaUsuario").equals(getSharedRut())){
+                                    sendLoging();
+                                }else{
+                                    sendMainActivity();
+                                }
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // VolleyLog.d("JSONPost", "Error: " + error.getMessage());
+                Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        queue.add(jsonReque);
+
+    }
 
 
 }
