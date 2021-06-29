@@ -43,7 +43,7 @@ public class Registro extends AppCompatActivity {
 
     private TextView text1;
     private EditText edit1,edit2,edit3;
-    private Button btn1;
+    private Button btn1,btn_ingreso;
     private SharedPreferences prefs;
     Realm mRealm;
 
@@ -60,6 +60,7 @@ public class Registro extends AppCompatActivity {
         edit2=findViewById(R.id.edit2);
         edit3=findViewById(R.id.edit3);
         btn1=findViewById(R.id.btn1);
+        btn_ingreso= findViewById(R.id.btn_login);
 
         prefs = getSharedPreferences("Preference", Context.MODE_PRIVATE);
 
@@ -95,7 +96,13 @@ public class Registro extends AppCompatActivity {
 
             }
         });
+        btn_ingreso.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                sendLoginActivity();
+            }
 
+        });
     }
 
     private void guardarEnRealm(String nombre, String run, String password) {
@@ -149,6 +156,11 @@ public class Registro extends AppCompatActivity {
         b.putBoolean("primer_login",true);
 
         intent.putExtras(b);
+        startActivity(intent);
+    }
+
+    private void sendLoginActivity(){
+        Intent intent = new Intent(Registro.this, Login.class);
         startActivity(intent);
     }
 

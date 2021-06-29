@@ -73,7 +73,13 @@ public class Login extends AppCompatActivity {
 
 
                 if(isValidForm()){
-                    /* Sacar pass de realm y no del shared , lo mismo con el rut */
+                    System.out.println("isValidForm");
+
+                    validarUsuario(run,contrasena);
+
+                    Toast.makeText(getApplicationContext(),"Validando",Toast.LENGTH_LONG).show();
+
+                    /* Sacar pass de realm y no del shared , lo mismo con el rut
 
                     mRealm = Realm.getDefaultInstance();
                     Usuario usuario = new Usuario();
@@ -92,12 +98,73 @@ public class Login extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(),"Error de contraseña o usuario",Toast.LENGTH_LONG).show();
                         }
 
+                     */
+
                 }else{
                     Toast.makeText(getApplicationContext(),"ERROR",Toast.LENGTH_LONG).show();
 
                 }
             }
         });
+
+    }
+
+
+    private void validarUsuario(final String run, final String contrasena) {
+
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("rutUsuario", run);
+        params.put("idAcceso",ACESS_ID);
+
+
+        // Toast.makeText(getApplicationContext(), params.toString() , Toast.LENGTH_SHORT).show();
+        String URL = URL_BASE+"GetUsuario";
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+
+        JsonObjectRequest jsonReque = new JsonObjectRequest(Request.Method.POST, URL, new JSONObject(params),
+                new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // Log.d("JSONPost", response.toString());
+                        try {
+                            String status = response.getString("status");
+                            JSONObject mensaje = response.getJSONObject("mensaje");
+
+                            if (status.equals("success")) {
+                                String responseRun=mensaje.getString("rutUsuario");
+                                String responseNombre=mensaje.getString("nombreUsuario");;
+                                String responseContrasena=mensaje.getString("contrasenaUsuario");;
+
+                                if(run.equals(mensaje.getString("rutUsuario")) && contrasena.equals(mensaje.getString("contrasenaUsuario"))){
+                                    mRealm = Realm.getDefaultInstance();
+
+                                    Accion_Usuario accion = new Accion_Usuario(run,"Login");
+
+                                    mRealm.beginTransaction();
+                                    mRealm.insertOrUpdate(accion);
+                                    mRealm.commitTransaction();
+
+                                    sendSecondActivity(responseNombre,responseRun,responseContrasena);
+                                }
+
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // VolleyLog.d("JSONPost", "Error: " + error.getMessage());
+                Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        queue.add(jsonReque);
 
     }
 
@@ -121,7 +188,7 @@ public class Login extends AppCompatActivity {
         b.putString("nombre",nombre);
         b.putString("run",run);
         b.putBoolean("primer_login",true);
-        b.putString("password" ,password);
+        b.putString("contrasena" ,password);
         intent.putExtras(b);
         startActivity(intent);
     }
