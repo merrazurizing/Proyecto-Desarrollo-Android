@@ -47,7 +47,7 @@ public class Registro extends AppCompatActivity {
     private SharedPreferences prefs;
     Realm mRealm;
 
-    public static final String URL_BASE = "http://abascur.cl/android/misnotasapp/";
+    public static final String URL_BASE = "https://abascur.cl/android/misnotasapp/";
     public static final String ACESS_ID="18808222";
 
     @Override
@@ -72,22 +72,27 @@ public class Registro extends AppCompatActivity {
 
                 //text1.setText(nombre);
 
+                if(Utilidades.verificaConexion(getApplication())){
+                    if(isValidForm()){
+                        if(estaRegistrado(run)){
+                            Toast.makeText(getApplicationContext(),"Usuario ya esta registrado",Toast.LENGTH_LONG).show();
+                        }else {
+                            Toast.makeText(getApplicationContext(),"OK",Toast.LENGTH_LONG).show();
+                            saveShared(nombre,run,password);
+                            guardarEnRealm(nombre,run,password);
+                            sendSecondActivity(nombre,password);
+                        }
 
+                    }else{
+                        Toast.makeText(getApplicationContext(),"ERROR",Toast.LENGTH_LONG).show();
 
-                if(isValidForm()){
-                    if(estaRegistrado(run)){
-                        Toast.makeText(getApplicationContext(),"Usuario ya esta registrado",Toast.LENGTH_LONG).show();
-                    }else {
-                        Toast.makeText(getApplicationContext(),"OK",Toast.LENGTH_LONG).show();
-                        saveShared(nombre,run,password);
-                        guardarEnRealm(nombre,run,password);
-                        sendSecondActivity(nombre,password);
                     }
-
                 }else{
-                    Toast.makeText(getApplicationContext(),"ERROR",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Esta acción necesita conexión a internet, comprueba tu conexión.", Toast.LENGTH_SHORT).show();
 
                 }
+
+
             }
         });
 
@@ -169,19 +174,23 @@ public class Registro extends AppCompatActivity {
     }
 
     private void InsertOrUpdate(final String rut,final String nombre,final String password){
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
 
         Map<String, String> params = new HashMap<String, String>();
+
         params.put("rutUsuario", String.valueOf(rut));
         params.put("nombreUsuario", String.valueOf(nombre));
         params.put("contrasenaUsuario", String.valueOf(password));
         params.put("fechaHoraCreacion",dtf.format(now));
-        params.put("idAcceso",ACESS_ID);
-        // Toast.makeText(getApplicationContext(), params.toString() , Toast.LENGTH_SHORT).show();
 
-        String URL = URL_BASE+"InsertOrUpdateAlumno";
+        params.put("idAcceso",ACESS_ID);
+        Toast.makeText(getApplicationContext(), params.toString() , Toast.LENGTH_SHORT).show();
+
+        String URL = URL_BASE+"InsertOrUpdateUsuario";
+        //Toast.makeText(getApplicationContext(), URL , Toast.LENGTH_SHORT).show();
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        System.out.println("URL "+URL);
 
         JsonObjectRequest jsonReque = new JsonObjectRequest(Request.Method.POST, URL, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
@@ -193,10 +202,13 @@ public class Registro extends AppCompatActivity {
                             String status = response.getString("status");
                             String mensaje = response.getString("mensaje");
                             if (status.equals("success")) {
+                                System.out.println("ASDASDASDASDADASDASD");
                                 // Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
                                 /*alumnosAppV2: Se actualiza en realm el estado*/
+                                UpdateEnviado(rut);
                             }
                         } catch (JSONException e) {
+                            System.out.println("CAtch");
                             e.printStackTrace();
                         }
                     }
@@ -211,6 +223,14 @@ public class Registro extends AppCompatActivity {
         });
 
         queue.add(jsonReque);
+    }
+
+    private void  UpdateEnviado(String rut){
+        mRealm.beginTransaction();
+        Usuario usuario = mRealm.where(Usuario.class).equalTo("run",rut).findFirst();
+        assert usuario!=null;
+        usuario.setSendBD(true);
+        mRealm.commitTransaction();
     }
 
     

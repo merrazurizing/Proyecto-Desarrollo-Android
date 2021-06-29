@@ -12,10 +12,21 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.myapplication.Models.Accion_Usuario;
 import com.example.myapplication.Models.Usuario;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import io.realm.Realm;
 
@@ -27,6 +38,10 @@ public class Login extends AppCompatActivity {
     private SharedPreferences prefs;
     private ArrayList<Usuario> lisUsuario =new ArrayList<>();
     private Realm mRealm;
+    public static final String URL_BASE = "https://abascur.cl/android/misnotasapp/";
+    public static final String ACESS_ID="18808222";
+    public JSONObject USUARIO;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,19 +76,31 @@ public class Login extends AppCompatActivity {
                     mRealm = Realm.getDefaultInstance();
                     Usuario usuario = new Usuario();
                     usuario=mRealm.where(Usuario.class).equalTo("run",run).findFirst();
+                    getUsuario(run);
 
-                    if(contrasena.equals(usuario.getPassword()) && run.equals(usuario.getRun())){
-                        Accion_Usuario accion = new Accion_Usuario(run,"Login");
+                    /*
+                    try {
+                        String responseRun = USUARIO.getJSONObject("mensaje").getString("rutUsuario");
+                        String responseContrasenna = USUARIO.getJSONObject("mensaje").getString("contrasenaUsuario");
 
-                        mRealm.beginTransaction();
-                        mRealm.insertOrUpdate(accion);
-                        mRealm.commitTransaction();
+                        Toast.makeText(getApplicationContext(),responseRun+" "+responseContrasenna,Toast.LENGTH_LONG).show();
 
-                        sendSecondActivity(usuario.getNombre(),usuario.getRun());
+                        if(responseRun.equals(run) && responseContrasenna.equals(contrasena)){
+                            Accion_Usuario accion = new Accion_Usuario(run,"Login");
+
+                            mRealm.beginTransaction();
+                            mRealm.insertOrUpdate(accion);
+                            mRealm.commitTransaction();
+
+                            sendSecondActivity(usuario.getNombre(),usuario.getRun());
+                        }
+                        else{
+                            Toast.makeText(getApplicationContext(),"Error de contraseña o usuario",Toast.LENGTH_LONG).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                    else{
-                        Toast.makeText(getApplicationContext(),"Error de contraseña o usuario",Toast.LENGTH_LONG).show();
-                    }
+                    */
 
                 }else{
                     Toast.makeText(getApplicationContext(),"ERROR",Toast.LENGTH_LONG).show();
@@ -83,6 +110,55 @@ public class Login extends AppCompatActivity {
         });
 
     }
+
+    private void getUsuario(final String run) {
+        System.out.println("PUTA");
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("rutUsuario", String.valueOf(run));
+        params.put("idAcceso",ACESS_ID);
+
+        System.out.println(run);
+        // Toast.makeText(getApplicationContext(), params.toString() , Toast.LENGTH_SHORT).show();
+        String URL = URL_BASE+"GetUsuario";
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+
+        JsonObjectRequest jsonReque = new JsonObjectRequest(Request.Method.POST, URL, new JSONObject(params),
+                new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // Log.d("JSONPost", response.toString());
+                        try {
+                            String status = response.getString("status");
+                            String mensaje = response.getString("mensaje");
+                            if (status.equals("success")) {
+                                Toast.makeText(getApplicationContext(), mensaje, Toast.LENGTH_SHORT).show();
+                                /*alumnosAppV2: Se actualiza en realm el estado*/
+                                System.out.println(response.toString());
+                                System.out.println(response.getJSONObject("mensaje"));
+                                System.out.println(mensaje);
+                                System.out.println(response.getJSONObject("mensaje").getString("rutUsuario"));
+                                USUARIO = response;
+
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // VolleyLog.d("JSONPost", "Error: " + error.getMessage());
+                Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        queue.add(jsonReque);
+
+    }
+
     private boolean isValidForm(){
         boolean r=false;
         if(TextUtils.isEmpty(edit3.getText())){
