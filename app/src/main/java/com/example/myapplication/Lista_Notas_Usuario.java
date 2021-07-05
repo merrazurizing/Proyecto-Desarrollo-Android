@@ -3,6 +3,7 @@ package com.example.myapplication;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -30,6 +31,7 @@ import com.example.myapplication.Models.Accion_Usuario;
 import com.example.myapplication.Models.Nota_Usuario;
 import com.example.myapplication.Models.Usuario;
 import com.example.myapplication.adapters.AccioneListAdapter;
+import com.example.myapplication.fragment.IngresarEditar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -100,6 +102,15 @@ public class Lista_Notas_Usuario extends AppCompatActivity {
 
         Usuario usuario = new Usuario();
 
+        floatingActionButton = findViewById(R.id.floatingActionButton);
+
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogAgregarNota();
+            }
+        });
+
 
         recyclerView = findViewById(R.id.recyclerView);
         adapter = new AccioneListAdapter(lista_notas, new AccioneListAdapter.OnItemClickListener() {
@@ -135,13 +146,7 @@ public class Lista_Notas_Usuario extends AppCompatActivity {
 
             }
 
-            floatingActionButton = findViewById(R.id.floatingActionButton);
-            floatingActionButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    DialogAgregarAlumno();
-                }
-            });
+
 
         });
 
@@ -207,7 +212,18 @@ public class Lista_Notas_Usuario extends AppCompatActivity {
         //text3_second.setText(lista_mostrar);
     }
 
+    private void DialogAgregarNota() {
+        FragmentManager fm = getSupportFragmentManager();
+        IngresarEditar dialog = new IngresarEditar().setAdepter(adapter).setArrayList(lista_notas);
+        dialog.show(fm, "simple");
 
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                //SyncbdRemote();
+            }
+        });
+    }
 
     private void clearShared(){
         SharedPreferences.Editor editor = prefs.edit();

@@ -1,66 +1,99 @@
 package com.example.myapplication.fragment;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
+import com.example.myapplication.Lista_Notas_Usuario;
+import com.example.myapplication.Models.Nota_Usuario;
 import com.example.myapplication.R;
+import com.example.myapplication.adapters.AccioneListAdapter;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link IngresarEditar#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class IngresarEditar extends Fragment {
+import java.text.Normalizer;
+import java.util.ArrayList;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+import io.realm.Realm;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+
+public class IngresarEditar extends DialogFragment {
+
+    private EditText nombre,descripcion;
+    private Button buttonGuardar;
+
+    private DialogInterface.OnDismissListener onDismissListener;
+
+    private AccioneListAdapter adapters;
+    private ArrayList<Nota_Usuario> list;
+
+    private Realm mRealm;
+
 
     public IngresarEditar() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment IngresarEditar.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static IngresarEditar newInstance(String param1, String param2) {
-        IngresarEditar fragment = new IngresarEditar();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+
+    public void setOnDismissListener(DialogInterface.OnDismissListener onDismissListener){
+        this.onDismissListener=onDismissListener;
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+    public void onDismiss(DialogInterface dialog){
+        super.onDismiss(dialog);
+        if(onDismissListener!=null){
+            onDismissListener.onDismiss(dialog);
         }
     }
 
+    public IngresarEditar setAdepter(AccioneListAdapter adepter){
+        this.adapters=adepter;
+        return this;
+    }
+
+    public IngresarEditar setArrayList(ArrayList<Nota_Usuario> list){
+        this.list=list;
+        return this;
+    }
+
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_ingresar_editar, container, false);
+    public View onCreateView(LayoutInflater inflater,ViewGroup container, Bundle savedInstance){
+        View v=inflater.inflate(R.layout.fragment_ingresar_editar, container, false);
+
+        mRealm = Realm.getDefaultInstance();
+
+        nombre = v.findViewById(R.id.input_nombreNota);
+        descripcion = v.findViewById(R.id.input_descripcionNota);
+        buttonGuardar = v.findViewById(R.id.button_Fragment);
+        /*
+        buttonGuardar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getContext(),"OK",Toast.LENGTH_LONG).show();
+                Nota_Usuario nora = new Nota_Usuario(editRut.getText().toString(),editNombre.getText().toString(),editApellido.getText().toString(),false);
+
+                mRealm.beginTransaction();
+                mRealm.insertOrUpdate(nota);
+                mRealm.commitTransaction();
+
+                list=new ArrayList(mRealm.where(Alumno.class).findAll());
+                adapters.updateList(list);
+                adapters.notifyDataSetChanged();
+                dismiss();
+            }
+        });
+
+        */
+
+        return v;
     }
 }
