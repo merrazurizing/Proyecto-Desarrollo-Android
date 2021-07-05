@@ -77,7 +77,7 @@ public class Login extends AppCompatActivity {
 
                     validarUsuario(run,contrasena);
 
-                    Toast.makeText(getApplicationContext(),"Validando",Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getApplicationContext(),"Validando",Toast.LENGTH_LONG).show();
 
                     /* Sacar pass de realm y no del shared , lo mismo con el rut
 
@@ -137,7 +137,7 @@ public class Login extends AppCompatActivity {
                                 String responseNombre=mensaje.getString("nombreUsuario");;
                                 String responseContrasena=mensaje.getString("contrasenaUsuario");;
 
-                                if(run.equals(mensaje.getString("rutUsuario")) && contrasena.equals(mensaje.getString("contrasenaUsuario"))){
+                                if(run.equals(responseRun) && contrasena.equals(responseContrasena)){
                                     mRealm = Realm.getDefaultInstance();
 
                                     Accion_Usuario accion = new Accion_Usuario(run,"Login");
@@ -147,6 +147,8 @@ public class Login extends AppCompatActivity {
                                     mRealm.commitTransaction();
 
                                     sendSecondActivity(responseNombre,responseRun,responseContrasena);
+                                }else{
+                                    Toast.makeText(getApplicationContext(),"Error de contraseña o usuario",Toast.LENGTH_LONG).show();
                                 }
 
                             }

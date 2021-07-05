@@ -33,7 +33,6 @@ public class Pantalla_Carga extends AppCompatActivity {
     public static final String URL_BASE = "https://abascur.cl/android/misnotasapp/";
     public static final String ACESS_ID="18808222";
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
