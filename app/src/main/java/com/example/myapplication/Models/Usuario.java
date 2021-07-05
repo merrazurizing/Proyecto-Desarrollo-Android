@@ -33,11 +33,9 @@ public class Usuario extends RealmObject {
     public boolean isSendBD() {
         return sendBD;
     }
-
     public void setSendBD(boolean sendBD) {
         this.sendBD = sendBD;
     }
-
     public int getId() {
         return id;
     }

@@ -10,8 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.myapplication.Acciones_Usuario;
 import com.example.myapplication.Models.Accion_Usuario;
+import com.example.myapplication.Models.Nota_Usuario;
 import com.example.myapplication.R;
 
 
@@ -21,13 +21,13 @@ import java.util.List;
 public class AccioneListAdapter extends RecyclerView.Adapter<AccioneListAdapter.ViewHolder> {
 
 
-    List<Accion_Usuario> ShowList;
+    List<Nota_Usuario> ShowList;
     Context context;
     int position;
     private OnItemClickListener itemClickListener;
 
 
-    public AccioneListAdapter(List<Accion_Usuario> showList, OnItemClickListener itemClickListener) {
+    public AccioneListAdapter(List<Nota_Usuario> showList, OnItemClickListener itemClickListener) {
         ShowList = showList;
         this.itemClickListener = itemClickListener;
     }
@@ -56,7 +56,7 @@ public class AccioneListAdapter extends RecyclerView.Adapter<AccioneListAdapter.
         return ShowList.size();
     }
     /*Se remplaza el listado*/
-    public void updateList(ArrayList<Accion_Usuario> data) {
+    public void updateList(ArrayList<Nota_Usuario> data) {
         ShowList = data;
         notifyDataSetChanged();
     }
@@ -77,26 +77,26 @@ public class AccioneListAdapter extends RecyclerView.Adapter<AccioneListAdapter.
 
         }
 
-        public void bind(final Accion_Usuario accionUsuario, final OnItemClickListener listener,final int i){
+        public void bind(final Nota_Usuario notaUsuario, final OnItemClickListener listener,final int i){
 
             //textId.setText(context.getString(R.string.nombre_apellido, Utilidades.primeraMayuscula(alumno.getNombre()), Utilidades.primeraMayuscula(alumno.getApellido())));
             //textRut.setText("" + Utilidades.formatearRut(alumno.getRut()));
 
 
             textId.setText(String.valueOf(i+1));
-            textAccion.setText(accionUsuario.getAccion());
+            textAccion.setText(notaUsuario.getNombre());
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    listener.OnItemClick(accionUsuario,getAdapterPosition());
+                    listener.OnItemClick(notaUsuario,getAdapterPosition());
                 }
             });
 
         }
     }
     public interface OnItemClickListener {
-        void OnItemClick(Accion_Usuario accionUsuario, int position);
+        void OnItemClick(Nota_Usuario notaUsuario, int position);
     }
 }
 

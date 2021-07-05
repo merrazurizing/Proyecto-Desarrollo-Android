@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:layout_margin="50dp"
     android:orientation="vertical"
-    tools:context=".Acciones_Usuario">
+    tools:context=".Lista_Notas_Usuario">
 
 
     <TextView
@@ -44,17 +44,30 @@
             android:layout_weight="1"
             android:text="Acción"
             android:textStyle="bold" />
+
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="365dp" />
+        android:layout_height="365dp" >
+
+    </androidx.recyclerview.widget.RecyclerView>
 
     <Button
         android:id="@+id/btn_atras_second"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/textAtras" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="72dp"
+        android:layout_gravity="end|bottom"
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="40dp"
+        android:focusable="true"
+        android:src="@mipmap/ic_launcher" />
 
 </LinearLayout>

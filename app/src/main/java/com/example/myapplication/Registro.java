@@ -147,7 +147,7 @@ public class Registro extends AppCompatActivity {
     }
 
     private void sendSecondActivity(String nombre,String run,String contrasena){
-        Intent intent = new Intent(Registro.this, Acciones_Usuario.class);
+        Intent intent = new Intent(Registro.this, Lista_Notas_Usuario.class);
         Bundle b =new Bundle();
 
         b.putString("nombre",nombre);

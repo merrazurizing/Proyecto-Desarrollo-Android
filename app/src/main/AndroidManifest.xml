@@ -14,7 +14,7 @@
         android:theme="@style/Theme.MyApplication">
         <activity android:name=".Login"></activity>
         <activity android:name=".Registro" />
-        <activity android:name=".Acciones_Usuario" />
+        <activity android:name=".Lista_Notas_Usuario" />
         <activity android:name=".Pantalla_Carga">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
