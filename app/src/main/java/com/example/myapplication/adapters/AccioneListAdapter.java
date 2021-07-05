@@ -4,6 +4,8 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -35,7 +37,7 @@ public class AccioneListAdapter extends RecyclerView.Adapter<AccioneListAdapter.
     @NonNull
     @Override
     public AccioneListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_accion,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_nota,parent,false);
         ViewHolder viewHolder = new ViewHolder(view);
 
         context = parent.getContext();
@@ -63,15 +65,17 @@ public class AccioneListAdapter extends RecyclerView.Adapter<AccioneListAdapter.
 
     public class ViewHolder extends RecyclerView.ViewHolder{
 
-        TextView textId, textAccion;
+        TextView textId,textNombre,textFecha;
+        ImageButton botonEliminar;
         CardView cv;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
-            textId = itemView.findViewById(R.id.textView_id);
-            textAccion = itemView.findViewById(R.id.textView_accion);
-
+            textId = itemView.findViewById(R.id.textView_idNota);
+            textNombre = itemView.findViewById(R.id.textView_nombreNota);
+            textFecha = itemView.findViewById(R.id.textView_fechaNota);
+            botonEliminar = itemView.findViewById(R.id.imageButton_eliminarNota);
             cv = itemView.findViewById(R.id.cardViewItem);
 
 
@@ -83,8 +87,9 @@ public class AccioneListAdapter extends RecyclerView.Adapter<AccioneListAdapter.
             //textRut.setText("" + Utilidades.formatearRut(alumno.getRut()));
 
 
-            textId.setText(String.valueOf(i+1));
-            textAccion.setText(notaUsuario.getNombre());
+            textId.setText(notaUsuario.getId());
+            textNombre.setText(notaUsuario.getNombre());
+            textFecha.setText(notaUsuario.getFecha_creacion());
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -93,10 +98,24 @@ public class AccioneListAdapter extends RecyclerView.Adapter<AccioneListAdapter.
                 }
             });
 
+            botonEliminar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    listener.OnDeleteClick(notaUsuario, getAdapterPosition());
+
+                }
+            });
+
         }
     }
     public interface OnItemClickListener {
         void OnItemClick(Nota_Usuario notaUsuario, int position);
+        void OnDeleteClick(Nota_Usuario notaUsuario, int position);
+    }
+
+    public void removeItem(int position) {
+        ShowList.remove(position);
+        notifyItemRemoved(position);
     }
 }
 

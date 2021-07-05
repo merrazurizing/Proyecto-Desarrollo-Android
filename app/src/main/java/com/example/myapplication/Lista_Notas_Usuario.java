@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -8,8 +9,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -27,12 +30,16 @@ import com.example.myapplication.Models.Accion_Usuario;
 import com.example.myapplication.Models.Nota_Usuario;
 import com.example.myapplication.Models.Usuario;
 import com.example.myapplication.adapters.AccioneListAdapter;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import io.realm.Realm;
 
@@ -49,6 +56,7 @@ public class Lista_Notas_Usuario extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private FrameLayout frameLayout;
+    private FloatingActionButton floatingActionButton;
 
     private AccioneListAdapter adapter;
 
@@ -93,16 +101,48 @@ public class Lista_Notas_Usuario extends AppCompatActivity {
         Usuario usuario = new Usuario();
 
 
-        String lista_mostrar="";
-        for (int i =0 ; i<= lista_notas.size()-1  ;i++){
-            lista_mostrar+=(i+1)+"--"+lista_notas.get(i).getRun_usuario()+"--"+lista_notas.get(i).getDescripcion()+"\n";
-        }
         recyclerView = findViewById(R.id.recyclerView);
         adapter = new AccioneListAdapter(lista_notas, new AccioneListAdapter.OnItemClickListener() {
             @Override
             public void OnItemClick(Nota_Usuario notaUsuario, int position) {
                 Toast.makeText(getApplicationContext(),"item:"+notaUsuario.getId(),Toast.LENGTH_LONG).show();
             }
+
+            @Override
+            public void OnDeleteClick(Nota_Usuario nota, int position) {
+                //Toast.makeText(getApplicationContext(),"itemDelete:"+alumno.getNombre(),Toast.LENGTH_LONG).show();
+
+                AlertDialog alertDialog = new AlertDialog.Builder(Lista_Notas_Usuario.this).create();
+                alertDialog.setTitle("Alerta");
+                alertDialog.setMessage("¿Esta seguro de eliminar a " + nota.getNombre() + "?");
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        deleteNota(nota);
+                        adapter.removeItem(position);
+                        dialogInterface.dismiss();
+
+                    }
+                });
+                alertDialog.show();
+
+
+            }
+
+            floatingActionButton = findViewById(R.id.floatingActionButton);
+            floatingActionButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    DialogAgregarAlumno();
+                }
+            });
+
         });
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
@@ -198,7 +238,6 @@ public class Lista_Notas_Usuario extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         //Log.d("JSONPost", response.toString());
-                        Toast.makeText(getApplicationContext(), response.toString(), Toast.LENGTH_SHORT).show();
 
                         try {
                             String status = response.getString("status");
@@ -219,7 +258,6 @@ public class Lista_Notas_Usuario extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 // VolleyLog.d("JSONPost", "Error: " + error.getMessage());
-                Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -230,7 +268,7 @@ public class Lista_Notas_Usuario extends AppCompatActivity {
     public void add_note_list_to_realm(JSONArray mensaje){
         lista_notas.clear();
         mRealm.beginTransaction();
-        mRealm.delete(Usuario.class);
+        mRealm.delete(Nota_Usuario.class);
         mRealm.commitTransaction();
         try {
             if (mensaje.length() > 0) {
@@ -251,7 +289,7 @@ public class Lista_Notas_Usuario extends AppCompatActivity {
                 }
             }
             mRealm.beginTransaction();
-            //mRealm.copyToRealmOrUpdate(lista_notas);
+            mRealm.copyToRealmOrUpdate(lista_notas);
             mRealm.commitTransaction();
             //mSwipeRefreshLayout.setRefreshing(false);
             adapter.updateList(lista_notas);
@@ -262,6 +300,66 @@ public class Lista_Notas_Usuario extends AppCompatActivity {
 
     }
 
+
+    public void deleteNota(Nota_Usuario nota) {
+        if(Utilidades.verificaConexion(getApplication())) {
+            DeleteBD(nota.getId(),nota.getRun_usuario());
+            System.out.println("NOTAAAAAAAAA"+nota.getRun_usuario() + "--" + nota.getNombre());
+            System.out.println("REALM" + mRealm.where(Nota_Usuario.class).findAll());
+            mRealm.beginTransaction();
+            mRealm.where(Nota_Usuario.class).equalTo("id", nota.getId()).findFirst().deleteFromRealm();
+            mRealm.commitTransaction();
+
+            Toast.makeText(getApplicationContext(), "Eliminado de forma correcta.", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(getApplicationContext(), "Esta acción necesita conexión a internet, comprueba tu conexión.", Toast.LENGTH_SHORT).show();
+
+        }
+    }
+
+    private void DeleteBD(final String id, final String run) {
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("idNota", String.valueOf(id));
+        params.put("rutUsuario", String.valueOf(run));
+        params.put("idAcceso", String.valueOf(ACESS_ID));
+
+
+
+        // Toast.makeText(getApplicationContext(), params.toString() , Toast.LENGTH_SHORT).show();
+        String URL = URL_BASE+"DeleteNota";
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+
+        JsonObjectRequest jsonReque = new JsonObjectRequest(Request.Method.POST, URL, new JSONObject(params),
+                new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // Log.d("JSONPost", response.toString());
+                        try {
+                            String status = response.getString("status");
+                            String mensaje = response.getString("mensaje");
+                            if (status.equals("success")) {
+                                Toast.makeText(getApplicationContext(), mensaje, Toast.LENGTH_SHORT).show();
+                                /*alumnosAppV2: Se actualiza en realm el estado*/
+                                // UpdateEnviado(rut);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // VolleyLog.d("JSONPost", "Error: " + error.getMessage());
+                Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        queue.add(jsonReque);
+
+    }
 
 
 }
