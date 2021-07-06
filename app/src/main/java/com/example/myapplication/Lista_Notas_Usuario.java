@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.realm.Realm;
+import io.realm.RealmResults;
 
 public class Lista_Notas_Usuario extends AppCompatActivity {
 
@@ -107,7 +108,7 @@ public class Lista_Notas_Usuario extends AppCompatActivity {
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogAgregarNota();
+                DialogAgregarNota(null);
             }
         });
 
@@ -116,7 +117,7 @@ public class Lista_Notas_Usuario extends AppCompatActivity {
         adapter = new AccioneListAdapter(lista_notas, new AccioneListAdapter.OnItemClickListener() {
             @Override
             public void OnItemClick(Nota_Usuario notaUsuario, int position) {
-                Toast.makeText(getApplicationContext(),"item:"+notaUsuario.getId(),Toast.LENGTH_LONG).show();
+                DialogAgregarNota(notaUsuario);
             }
 
             @Override
@@ -212,15 +213,15 @@ public class Lista_Notas_Usuario extends AppCompatActivity {
         //text3_second.setText(lista_mostrar);
     }
 
-    private void DialogAgregarNota() {
+    private void DialogAgregarNota(Nota_Usuario notaUsuario) {
         FragmentManager fm = getSupportFragmentManager();
-        IngresarEditar dialog = new IngresarEditar().setAdepter(adapter).setArrayList(lista_notas);
+        IngresarEditar dialog = new IngresarEditar().setAdepter(adapter).setArrayList(lista_notas).setNota(notaUsuario).setRun(rut);
         dialog.show(fm, "simple");
 
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
-                //SyncbdRemote();
+                SyncbdRemote();
             }
         });
     }
@@ -378,4 +379,71 @@ public class Lista_Notas_Usuario extends AppCompatActivity {
     }
 
 
+    private void SyncbdRemote(){
+        RealmResults<Nota_Usuario> ListadoNoSync=mRealm.where(Nota_Usuario.class).equalTo("sendBD",false).findAll();
+        if(ListadoNoSync.size()>0){
+            for(int i=0;i<ListadoNoSync.size();i++){
+                String id = ListadoNoSync.get(i).getId();
+                String nombre = ListadoNoSync.get(i).getNombre();
+                String descripcion = ListadoNoSync.get(i).getDescripcion();
+                String fecha_creacion = ListadoNoSync.get(i).getFecha_creacion();
+                String rut = ListadoNoSync.get(i).getRun_usuario();
+                InsertOrUpdate(id,nombre,descripcion,fecha_creacion,rut);
+            }
+        }
+    }
+
+    private void InsertOrUpdate(final String id,final String nombre,final String descripcion,final String fecha_creacion,final String rut){
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("rutUsuario", String.valueOf(rut));
+        params.put("idNota", String.valueOf(id));
+        params.put("nombreNota", String.valueOf(nombre));
+        params.put("descripcionNota", String.valueOf(descripcion));
+        params.put("fechaHoraCreacion", String.valueOf(fecha_creacion));
+        params.put("idAcceso", ACESS_ID);
+
+        // Toast.makeText(getApplicationContext(), params.toString() , Toast.LENGTH_SHORT).show();
+
+        String URL = URL_BASE+"InsertOrUpdateNota";
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+
+        JsonObjectRequest jsonReque = new JsonObjectRequest(Request.Method.POST, URL, new JSONObject(params),
+                new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // Log.d("JSONPost", response.toString());
+                        try {
+                            String status = response.getString("status");
+                            String mensaje = response.getString("mensaje");
+                            if (status.equals("success")) {
+                                System.out.println("Agrege bitches");
+                                UpdateEnviado(id);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // VolleyLog.d("JSONPost", "Error: " + error.getMessage());
+                Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        queue.add(jsonReque);
+    }
+
+
+    private void  UpdateEnviado(String id){
+        mRealm.beginTransaction();
+        Nota_Usuario nota = mRealm.where(Nota_Usuario.class).equalTo("id",id).findFirst();
+        assert nota!=null;
+        System.out.println("HOLA REAL SENDBD TRUE SOY:"+ nota.getNombre());
+        nota.setSendBD(true);
+        mRealm.commitTransaction();
+    }
 }

@@ -22,6 +22,8 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 
 import io.realm.Realm;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 
 
 public class IngresarEditar extends DialogFragment {
@@ -33,8 +35,10 @@ public class IngresarEditar extends DialogFragment {
 
     private AccioneListAdapter adapters;
     private ArrayList<Nota_Usuario> list;
+    private Nota_Usuario nota;
 
     private Realm mRealm;
+    private String rut;
 
 
     public IngresarEditar() {
@@ -59,6 +63,16 @@ public class IngresarEditar extends DialogFragment {
         return this;
     }
 
+    public IngresarEditar setRun(String run){
+        this.rut=run;
+        return this;
+    }
+
+    public IngresarEditar setNota(Nota_Usuario nota){
+        this.nota=nota;
+        return this;
+    }
+
     public IngresarEditar setArrayList(ArrayList<Nota_Usuario> list){
         this.list=list;
         return this;
@@ -70,29 +84,38 @@ public class IngresarEditar extends DialogFragment {
         View v=inflater.inflate(R.layout.fragment_ingresar_editar, container, false);
 
         mRealm = Realm.getDefaultInstance();
-
         nombre = v.findViewById(R.id.input_nombreNota);
         descripcion = v.findViewById(R.id.input_descripcionNota);
         buttonGuardar = v.findViewById(R.id.button_Fragment);
-        /*
-        buttonGuardar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getContext(),"OK",Toast.LENGTH_LONG).show();
-                Nota_Usuario nora = new Nota_Usuario(editRut.getText().toString(),editNombre.getText().toString(),editApellido.getText().toString(),false);
+        if(nota==null){
+            buttonGuardar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Toast.makeText(getContext(),"Ingresar",Toast.LENGTH_LONG).show();
 
-                mRealm.beginTransaction();
-                mRealm.insertOrUpdate(nota);
-                mRealm.commitTransaction();
+                    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                    DateTimeFormatter id = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+                    LocalDateTime now = LocalDateTime.now();
 
-                list=new ArrayList(mRealm.where(Alumno.class).findAll());
-                adapters.updateList(list);
-                adapters.notifyDataSetChanged();
-                dismiss();
-            }
-        });
 
-        */
+                    Nota_Usuario nota = new Nota_Usuario(id.format(now), nombre.getText().toString(), descripcion.getText().toString(), dtf.format(now), dtf.format(now), dtf.format(now), rut);
+
+                    mRealm.beginTransaction();
+                    mRealm.insertOrUpdate(nota);
+                    mRealm.commitTransaction();
+
+
+                    list=new ArrayList(mRealm.where(Nota_Usuario.class).findAll());
+                    adapters.updateList(list);
+                    adapters.notifyDataSetChanged();
+                    dismiss();
+                }
+            });
+        }else {
+
+
+        }
+
 
         return v;
     }

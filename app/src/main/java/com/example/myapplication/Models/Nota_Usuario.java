@@ -12,6 +12,7 @@ public class Nota_Usuario extends RealmObject {
     private String fecha_update;
     private String fecha_insert;
     private String run_usuario;
+    private boolean sendBD=false;
 
     public Nota_Usuario() {
     }
@@ -24,6 +25,14 @@ public class Nota_Usuario extends RealmObject {
         this.fecha_update = fecha_update;
         this.fecha_insert = fecha_insert;
         this.run_usuario = run_usuario;
+    }
+
+    public boolean isSendBD() {
+        return sendBD;
+    }
+
+    public void setSendBD(boolean sendBD) {
+        this.sendBD = sendBD;
     }
 
     public String getId() {
