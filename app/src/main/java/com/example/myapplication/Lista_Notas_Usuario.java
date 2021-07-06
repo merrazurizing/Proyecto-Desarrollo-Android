@@ -445,5 +445,7 @@ public class Lista_Notas_Usuario extends AppCompatActivity {
         System.out.println("HOLA REAL SENDBD TRUE SOY:"+ nota.getNombre());
         nota.setSendBD(true);
         mRealm.commitTransaction();
+
+        get_user_notes();
     }
 }

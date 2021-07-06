@@ -14,45 +14,53 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="left"
             android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/textView_idNota"
-                android:orientation="vertical"
-                android:layout_gravity="center_vertical"
-                android:layout_width="37dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="ID" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="left"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/textView_nombreNota"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:gravity="start|left"
-                android:text="Nota"
-                android:textAlignment="textStart" />
+                <TextView
+                    android:id="@+id/textView_idNota"
+                    android:layout_width="37dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:text="ID" />
 
-            <TextView
-                android:id="@+id/textView_fechaNota"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:text="fecha" />
+                <TextView
+                    android:id="@+id/textView_nombreNota"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:gravity="start|left"
+                    android:orientation="vertical"
+                    android:text="Nota"
+                    android:textAlignment="textStart" />
 
-            <ImageButton
-                android:id="@+id/imageButton_eliminarNota"
-                android:layout_width="5dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                app:srcCompat="@android:drawable/ic_delete" />
+                <TextView
+                    android:id="@+id/textView_fechaNota"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:text="fecha" />
 
+                <ImageButton
+                    android:id="@+id/imageButton_eliminarNota"
+                    android:layout_width="5dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@color/cardview_shadow_end_color"
+                    app:srcCompat="@drawable/ic_baseline_delete_24" />
+
+            </LinearLayout>
         </LinearLayout>
+
     </androidx.cardview.widget.CardView>
 </LinearLayout>
