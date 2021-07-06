@@ -140,17 +140,30 @@ public class IngresarEditar extends DialogFragment {
                             LocalDateTime now = LocalDateTime.now();
 
 
-                            Nota_Usuario notaAux = new Nota_Usuario(nota.getId(), nombre.getText().toString(), descripcion.getText().toString(), dtf.format(now), dtf.format(now), dtf.format(now), rut);
+                           /* Nota_Usuario notaAux = new Nota_Usuario(nota.getId(), nombre.getText().toString(), descripcion.getText().toString(), dtf.format(now), dtf.format(now), dtf.format(now), rut);
                             notaAux.setSendBD(false);
+                            */
+
+
+                            // ¿Sere yo?
+                            nota.setNombre(nombre.getText().toString());
+                            nota.setNombre(descripcion.getText().toString());
+                            nota.setFecha_update(dtf.format(now));
+                            nota.setSendBD(false);
 
                             mRealm.beginTransaction();
-                            mRealm.insertOrUpdate(notaAux);
+                            mRealm.insertOrUpdate(nota);
                             mRealm.commitTransaction();
-                            /*
+
+                            list.clear();
                             list=new ArrayList(mRealm.where(Nota_Usuario.class).findAll());
+                            for( Nota_Usuario nota : list){
+                                System.out.println("nombre : " + nota.getNombre());
+                                System.out.println("id : " + nota.getId());
+                            }
                             adapters.updateList(list);
                             adapters.notifyDataSetChanged();
-                            */
+
                             dismiss();
                         }
                     });

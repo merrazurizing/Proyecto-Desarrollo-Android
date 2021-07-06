@@ -240,8 +240,6 @@ public class Lista_Notas_Usuario extends AppCompatActivity {
         editor.putString("nombre",nombre);
         editor.putString("run",run);
         editor.putString("contrasena",contrasena);
-        System.out.println("run "+run);
-        System.out.println("contrasena "+contrasena);
         editor.apply();
     }
 
@@ -293,7 +291,6 @@ public class Lista_Notas_Usuario extends AppCompatActivity {
 
                     JSONObject jsonObject = mensaje.getJSONObject(i);
                     String run = jsonObject.getString("rutUsuario");
-                    System.out.println("Rut de API : " + run +"y Rut de Shared : " + rut);
                     if(rut.equals(run)){
                         String id = jsonObject.getString("idNota");
                         String nombre = jsonObject.getString("nombreNota");
@@ -321,8 +318,6 @@ public class Lista_Notas_Usuario extends AppCompatActivity {
     public void deleteNota(Nota_Usuario nota) {
         if(Utilidades.verificaConexion(getApplication())) {
             DeleteBD(nota.getId(),nota.getRun_usuario());
-            System.out.println("NOTAAAAAAAAA"+nota.getRun_usuario() + "--" + nota.getNombre());
-            System.out.println("REALM" + mRealm.where(Nota_Usuario.class).findAll());
             mRealm.beginTransaction();
             mRealm.where(Nota_Usuario.class).equalTo("id", nota.getId()).findFirst().deleteFromRealm();
             mRealm.commitTransaction();
@@ -417,8 +412,8 @@ public class Lista_Notas_Usuario extends AppCompatActivity {
                             String status = response.getString("status");
                             String mensaje = response.getString("mensaje");
                             if (status.equals("success")) {
-                                System.out.println("Agrege bitches");
                                 UpdateEnviado(id);
+                            }else{
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -430,7 +425,6 @@ public class Lista_Notas_Usuario extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 // VolleyLog.d("JSONPost", "Error: " + error.getMessage());
-                Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -442,10 +436,9 @@ public class Lista_Notas_Usuario extends AppCompatActivity {
         mRealm.beginTransaction();
         Nota_Usuario nota = mRealm.where(Nota_Usuario.class).equalTo("id",id).findFirst();
         assert nota!=null;
-        System.out.println("HOLA REAL SENDBD TRUE SOY:"+ nota.getNombre());
         nota.setSendBD(true);
         mRealm.commitTransaction();
 
-        get_user_notes();
+        //get_user_notes();
     }
 }
